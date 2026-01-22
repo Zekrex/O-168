@@ -10,60 +10,46 @@
 </script>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
+body{margin:0;font-family:Arial;background:#0e0e0e;color:#fff}
 header{
   position:sticky;top:0;
-  background:#0f0f0f;
+  background:#0e0e0e;
   padding:14px;
-  display:flex;justify-content:center;
+  text-align:center;
   border-bottom:1px solid #222;
 }
 .logo{font-size:22px;font-weight:bold;cursor:pointer}
 .logo span{color:#ff3b3b}
 
-#menuBtn{
-  position:fixed;
-  top:14px;left:14px;
-  font-size:22px;
-  z-index:30;
-  cursor:pointer;
-}
-
-#sideMenu{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,.6);
-  display:none;
-  z-index:20;
-}
-#sideMenu .panel{
-  width:260px;height:100%;
-  background:#111;
-  padding:20px;
-}
-#sideMenu.open{display:block}
-#sideMenu div{padding:12px 0;border-bottom:1px solid #222;cursor:pointer}
-
 .screen{display:none;padding:16px}
 .screen.active{display:block}
 
-.product{
-  background:#1c1c1c;
-  padding:14px;
+.category,.product{
+  background:#1a1a1a;
+  padding:16px;
   border-radius:14px;
-  margin-bottom:10px;
+  margin-bottom:12px;
   cursor:pointer;
 }
 
+.back{color:#aaa;margin-bottom:10px;cursor:pointer}
+
+.option-group{margin-bottom:14px}
 .option{
-  border:1px solid #444;
-  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  background:#222;
   border-radius:10px;
   margin:6px 0;
   cursor:pointer;
 }
 .option.active{background:#ff3b3b}
+
+.price-box{
+  font-size:18px;
+  margin:12px 0;
+}
 
 button{
   width:100%;
@@ -71,94 +57,99 @@ button{
   background:#ff3b3b;
   border:none;
   border-radius:12px;
-  color:white;
   font-size:16px;
+  color:white;
 }
-
-.back{margin-bottom:10px;color:#aaa;cursor:pointer}
 </style>
 </head>
 
 <body>
 
-<div id="menuBtn" onclick="toggleMenu()">☰</div>
-
 <header>
-  <div class="logo" onclick="show('menu')">O'<span>168</span></div>
+  <div class="logo" onclick="show('categories')">O'<span>168</span></div>
 </header>
 
-<!-- MENU OVERLAY -->
-<div id="sideMenu">
-  <div class="panel">
-    <div onclick="show('menu');toggleMenu()">Accueil</div>
-    <div onclick="show('contact');toggleMenu()">Contact</div>
-    <div onclick="show('about');toggleMenu()">À propos</div>
-  </div>
+<!-- CATÉGORIES -->
+<div id="categories" class="screen active">
+  <div class="category" onclick="openCategory('burgers')">🍔 Burgers</div>
+  <div class="category">🌮 Tacos</div>
+  <div class="category">🍕 Pizzas</div>
+  <div class="category">🍰 Desserts</div>
+  <div class="category">🥤 Boissons</div>
 </div>
 
-<!-- MENU -->
-<div id="menu" class="screen active">
-  <div class="product" onclick="openProduct()">
-    <strong>Cheese Burger</strong><br>9 €
-  </div>
+<!-- PRODUITS BURGERS -->
+<div id="burgers" class="screen">
+  <div class="back" onclick="show('categories')">← Retour</div>
+  <div class="product" onclick="openProduct()">Cheese Burger — 9 €</div>
 </div>
 
 <!-- FICHE PRODUIT -->
 <div id="product" class="screen">
-  <div class="back" onclick="show('menu')">← Retour</div>
+  <div class="back" onclick="show('burgers')">← Retour</div>
 
-  <!-- 3D + AR -->
   <model-viewer
     src="models/cheeseburger.glb"
     ios-src="models/cheeseburger.usdz"
-    ar
-    ar-modes="scene-viewer quick-look"
-    camera-controls
-    auto-rotate
-    style="width:100%;height:300px;">
+    ar camera-controls auto-rotate
+    style="width:100%;height:280px;">
   </model-viewer>
 
   <h2>Cheese Burger</h2>
 
-  <h3>Boisson</h3>
-  <div class="option">Coca</div>
-  <div class="option">Sprite</div>
+  <!-- BOISSON -->
+  <div class="option-group">
+    <h3>Boisson (1 incluse)</h3>
+    <div class="option active" onclick="selectOption(this,'drink',0)">Coca +0€</div>
+    <div class="option" onclick="selectOption(this,'drink',0)">Sprite +0€</div>
+    <div class="option" onclick="selectOption(this,'drink',1.5)">Boisson supp +1,50€</div>
+  </div>
 
-  <h3>Frites</h3>
-  <div class="option">Avec frites</div>
-  <div class="option">Sans frites</div>
+  <!-- FRITES -->
+  <div class="option-group">
+    <h3>Frites</h3>
+    <div class="option active" onclick="selectOption(this,'fries',0)">Sans frites</div>
+    <div class="option" onclick="selectOption(this,'fries',2)">Avec frites +2€</div>
+  </div>
 
-  <h3>Sauces</h3>
-  <div class="option">Ketchup</div>
-  <div class="option">Mayo</div>
-  <div class="option">BBQ</div>
+  <!-- SAUCES -->
+  <div class="option-group">
+    <h3>Sauce extra</h3>
+    <div class="option active" onclick="selectOption(this,'sauce',0)">Aucune</div>
+    <div class="option" onclick="selectOption(this,'sauce',0.5)">Ketchup +0,50€</div>
+    <div class="option" onclick="selectOption(this,'sauce',0.5)">Mayo +0,50€</div>
+  </div>
+
+  <div class="price-box">
+    Total : <strong><span id="total">9.00</span> €</strong>
+  </div>
 
   <button>Ajouter au panier</button>
 </div>
 
-<div id="contact" class="screen">
-  📞 06 12 34 56 78<br>
-  📧 contact@o168.fr
-</div>
-
-<div id="about" class="screen">
-  Street food premium 🍔🔥
-</div>
-
 <script>
+let basePrice = 9;
+let selections = {drink:0, fries:0, sauce:0};
+
 function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
-function toggleMenu(){
-  document.getElementById("sideMenu").classList.toggle("open");
+
+function openCategory(id){ show(id); }
+function openProduct(){ show('product'); }
+
+function selectOption(el, group, price){
+  el.parentElement.querySelectorAll('.option').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selections[group] = price;
+  updateTotal();
 }
-function openProduct(){
-  show("product");
+
+function updateTotal(){
+  let total = basePrice + selections.drink + selections.fries + selections.sauce;
+  document.getElementById('total').innerText = total.toFixed(2);
 }
-document.querySelectorAll(".option").forEach(o=>{
-  o.onclick=()=>o.classList.toggle("active");
-});
 </script>
 
 </body>
