@@ -1,277 +1,247 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>O'168</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>O'168</title>
 
-  <style>
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-      --card: #f3f3f3;
-      --accent: #ff3b3b;
-    }
+<style>
+:root{
+  --bg:#ffffff;
+  --text:#000;
+  --card:#f2f2f2;
+  --accent:#ff3b3b;
+}
+.dark{
+  --bg:#0f0f0f;
+  --text:#fff;
+  --card:#1c1c1c;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    header {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      border-bottom: 1px solid #ddd;
-      padding: 14px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-    }
+header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:14px;
+  position:sticky;
+  top:0;
+  background:var(--bg);
+  border-bottom:1px solid #3333;
+  z-index:10;
+}
 
-    header span {
-      color: var(--accent);
-    }
+header h1{
+  margin:0;
+}
+header span{color:var(--accent);}
+.theme-toggle{
+  position:absolute;
+  right:16px;
+  cursor:pointer;
+  font-size:20px;
+}
 
-    /* CATEGORIES */
-    .categories {
-      display: flex;
-      gap: 10px;
-      padding: 12px;
-      overflow-x: auto;
-    }
+.categories{
+  display:flex;
+  gap:10px;
+  padding:12px;
+  overflow-x:auto;
+}
+.category{
+  padding:10px 16px;
+  background:var(--card);
+  border-radius:20px;
+  cursor:pointer;
+  white-space:nowrap;
+  font-weight:bold;
+}
+.category.active{
+  background:var(--accent);
+  color:white;
+}
 
-    .category {
-      flex: 0 0 auto;
-      padding: 10px 16px;
-      background: var(--card);
-      border-radius: 20px;
-      cursor: pointer;
-      white-space: nowrap;
-      font-weight: bold;
-    }
+.products{
+  padding:12px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
+}
 
-    .category.active {
-      background: var(--accent);
-      color: white;
-    }
+.product{
+  background:var(--card);
+  border-radius:14px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
 
-    /* PRODUITS */
-    .products {
-      padding: 12px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-    }
+.product button{
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.add{background:var(--accent);color:white;}
+.ar{background:#444;color:white;}
+.qr{background:#888;color:white;}
 
-    .product {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+.cart{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:black;
+  color:white;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+}
 
-    .product h3 {
-      margin: 0 0 6px;
-      font-size: 16px;
-    }
-
-    .product p {
-      margin: 0;
-      font-size: 13px;
-      opacity: 0.8;
-    }
-
-    .product button {
-      margin-top: 10px;
-      padding: 8px;
-      border: none;
-      border-radius: 8px;
-      background: var(--accent);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* PANIER */
-    .cart {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #000;
-      color: #fff;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .cart button {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* MODAL PANIER */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: flex-end;
-    }
-
-    .modal-content {
-      background: var(--bg);
-      width: 100%;
-      max-height: 80%;
-      border-radius: 16px 16px 0 0;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
-    .modal h2 {
-      margin-top: 0;
-    }
-
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .close {
-      text-align: right;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+.modal{
+  position:fixed;
+  inset:0;
+  background:#0008;
+  display:none;
+  align-items:flex-end;
+}
+.modal-content{
+  background:var(--bg);
+  width:100%;
+  border-radius:16px 16px 0 0;
+  padding:16px;
+  max-height:80%;
+  overflow:auto;
+}
+.close{text-align:right;font-weight:bold;cursor:pointer}
+</style>
 </head>
 
 <body>
 
-  <header>
-    O'<span>168</span>
-  </header>
+<header>
+  <h1>O'<span>168</span></h1>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</header>
 
-  <!-- CATEGORIES -->
-  <div class="categories" id="categories">
-    <div class="category active" data-cat="burger">Burgers</div>
-    <div class="category" data-cat="tacos">Tacos</div>
-    <div class="category" data-cat="bowl">Bowls</div>
-    <div class="category" data-cat="boisson">Boissons</div>
+<div class="categories" id="categories"></div>
+<div class="products" id="products"></div>
+
+<div class="cart">
+  <div id="cart-count">0 article</div>
+  <button onclick="openCart()">Panier</button>
+</div>
+
+<div class="modal" id="cartModal">
+  <div class="modal-content">
+    <div class="close" onclick="closeCart()">✕</div>
+    <h2>Votre commande</h2>
+    <div id="cartItems"></div>
+    <label>Numéro de table
+      <input type="number" style="width:100%;padding:8px">
+    </label>
   </div>
+</div>
 
-  <!-- PRODUITS -->
-  <div class="products" id="products"></div>
+<script>
+const data={
+  Burgers:[
+    {n:"Classic Burger",p:8},
+    {n:"Cheese Burger",p:9},
+    {n:"Double Smash",p:11},
+    {n:"BBQ Burger",p:10}
+  ],
+  Tacos:[
+    {n:"Tacos Poulet",p:7},
+    {n:"Tacos Mixte",p:8},
+    {n:"Tacos XL",p:10}
+  ],
+  Bowls:[
+    {n:"Bowl Poulet",p:9},
+    {n:"Bowl Saumon",p:11}
+  ],
+  Pizzas:[
+    {n:"Margherita",p:9},
+    {n:"Pepperoni",p:11}
+  ],
+  Sandwichs:[
+    {n:"Panini Poulet",p:6},
+    {n:"Wrap Boeuf",p:7}
+  ],
+  Desserts:[
+    {n:"Brownie",p:4},
+    {n:"Cheesecake",p:5}
+  ],
+  Boissons:[
+    {n:"Coca",p:2},
+    {n:"Ice Tea",p:2}
+  ]
+};
 
-  <!-- PANIER BAR -->
-  <div class="cart">
-    <div id="cart-count">0 article</div>
-    <button onclick="openCart()">Voir panier</button>
-  </div>
+let currentCat=Object.keys(data)[0];
+let cart=[];
 
-  <!-- MODAL PANIER -->
-  <div class="modal" id="cartModal">
-    <div class="modal-content">
-      <div class="close" onclick="closeCart()">✕</div>
-      <h2>Votre commande</h2>
-      <div id="cartItems"></div>
-      <hr>
-      <label>
-        Numéro de table :
-        <input type="number" id="tableNumber" style="width:100%;padding:8px;">
-      </label>
-      <br><br>
-      <button style="width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:10px;">
-        Continuer
-      </button>
-    </div>
-  </div>
+const cats=document.getElementById("categories");
+const prods=document.getElementById("products");
 
-  <script>
-    const data = {
-      burger: [
-        { name: "Classic Burger", price: 8 },
-        { name: "Cheese Burger", price: 9 },
-        { name: "Double Smash", price: 11 }
-      ],
-      tacos: [
-        { name: "Tacos Poulet", price: 7 },
-        { name: "Tacos Mixte", price: 8 }
-      ],
-      bowl: [
-        { name: "Bowl Poulet", price: 9 }
-      ],
-      boisson: [
-        { name: "Coca", price: 2 },
-        { name: "Ice Tea", price: 2 }
-      ]
-    };
+Object.keys(data).forEach((c,i)=>{
+  const d=document.createElement("div");
+  d.className="category"+(i===0?" active":"");
+  d.textContent=c;
+  d.onclick=()=>selectCat(c,d);
+  cats.appendChild(d);
+});
 
-    let currentCat = "burger";
-    let cart = [];
+function selectCat(c,el){
+  document.querySelectorAll(".category").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+  currentCat=c;
+  render();
+}
 
-    const productsEl = document.getElementById("products");
-    const cartCount = document.getElementById("cart-count");
-    const cartItems = document.getElementById("cartItems");
+function render(){
+  prods.innerHTML="";
+  data[currentCat].forEach(p=>{
+    const d=document.createElement("div");
+    d.className="product";
+    d.innerHTML=`
+      <strong>${p.n}</strong>
+      <span>${p.p} €</span>
+      <button class="add" onclick="add('${p.n}',${p.p})">Ajouter</button>
+      <button class="ar">Voir en AR</button>
+      <button class="qr">QR produit</button>
+    `;
+    prods.appendChild(d);
+  });
+}
 
-    function renderProducts() {
-      productsEl.innerHTML = "";
-      data[currentCat].forEach(p => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <h3>${p.name}</h3>
-          <p>${p.price} €</p>
-          <button onclick='addToCart("${p.name}", ${p.price})'>Ajouter</button>
-        `;
-        productsEl.appendChild(div);
-      });
-    }
+function add(n,p){
+  cart.push({n,p});
+  document.getElementById("cart-count").textContent=cart.length+" article(s)";
+}
 
-    function addToCart(name, price) {
-      cart.push({ name, price });
-      cartCount.textContent = cart.length + " article(s)";
-    }
+function openCart(){
+  const ci=document.getElementById("cartItems");
+  ci.innerHTML="";
+  cart.forEach(i=>ci.innerHTML+=`<div>${i.n} - ${i.p}€</div>`);
+  document.getElementById("cartModal").style.display="flex";
+}
+function closeCart(){document.getElementById("cartModal").style.display="none";}
 
-    function openCart() {
-      cartItems.innerHTML = "";
-      cart.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "cart-item";
-        div.innerHTML = `<span>${item.name}</span><span>${item.price} €</span>`;
-        cartItems.appendChild(div);
-      });
-      document.getElementById("cartModal").style.display = "flex";
-    }
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.theme=document.body.classList.contains("dark")?"dark":"light";
+}
+if(localStorage.theme==="dark")document.body.classList.add("dark");
 
-    function closeCart() {
-      document.getElementById("cartModal").style.display = "none";
-    }
-
-    document.querySelectorAll(".category").forEach(cat => {
-      cat.onclick = () => {
-        document.querySelectorAll(".category").forEach(c => c.classList.remove("active"));
-        cat.classList.add("active");
-        currentCat = cat.dataset.cat;
-        renderProducts();
-      };
-    });
-
-    renderProducts();
-  </script>
+render();
+</script>
 
 </body>
 </html>
-
