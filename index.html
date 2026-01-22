@@ -11,7 +11,8 @@
 body{margin:0;font-family:Arial;background:#0b0b0b;color:#fff}
 header{
   display:flex;align-items:center;justify-content:center;
-  padding:14px;border-bottom:1px solid #222;position:sticky;top:0;background:#0b0b0b;z-index:10
+  padding:14px;border-bottom:1px solid #222;
+  position:sticky;top:0;background:#0b0b0b;z-index:10
 }
 .menu-btn{position:absolute;left:16px;font-size:22px;cursor:pointer}
 .logo{font-size:22px;font-weight:bold;cursor:pointer}
@@ -36,9 +37,17 @@ header{
 }
 .option.active{background:#ff3b3b}
 
+.qty{
+  display:flex;justify-content:space-between;align-items:center;margin:12px 0
+}
+.qty button{
+  width:40px;height:40px;border-radius:50%;
+  background:#ff3b3b;color:white;font-size:20px;border:none
+}
+
 button{
   width:100%;padding:14px;border:none;border-radius:14px;
-  background:#ff3b3b;color:white;font-size:16px
+  background:#ff3b3b;color:white;font-size:16px;margin-top:12px
 }
 
 .cart-icon{
@@ -58,7 +67,7 @@ button{
 <body>
 
 <header>
-  <div class="menu-btn">☰</div>
+  <div class="menu-btn" onclick="go('menu')">☰</div>
   <div class="logo" onclick="go('home')">O'<span>168</span></div>
 </header>
 
@@ -67,13 +76,35 @@ button{
   <div class="card" onclick="go('burgers')">🍔 Burgers</div>
   <div class="card" onclick="go('tacos')">🌮 Tacos</div>
   <div class="card" onclick="go('pizzas')">🍕 Pizzas</div>
-  <div class="card">🍰 Desserts</div>
-  <div class="card">🥤 Boissons</div>
+  <div class="card" onclick="go('desserts')">🍰 Desserts</div>
+  <div class="card" onclick="go('boissons')">🥤 Boissons</div>
+</div>
+
+<!-- MENU LATERAL -->
+<div id="menu" class="screen">
+  <div class="back" onclick="go('home')">← Retour</div>
+  <div class="card" onclick="go('contact')">📞 Contact</div>
+  <div class="card" onclick="go('info')">ℹ️ Infos</div>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="screen">
+  <div class="back" onclick="go('home')">← Menu</div>
+  <p>📞 06 12 34 56 78</p>
+  <p>📧 contact@o168.fr</p>
+  <p>📍 O'168 Burger – Paris</p>
+</div>
+
+<!-- INFO -->
+<div id="info" class="screen">
+  <div class="back" onclick="go('home')">← Menu</div>
+  <p>⏰ Ouvert 7j/7 – 11h à 23h</p>
+  <p>🍔 Produits frais – Fait maison</p>
 </div>
 
 <!-- BURGERS -->
 <div id="burgers" class="screen">
-  <div class="back" onclick="go('home')">← Retour</div>
+  <div class="back" onclick="go('home')">← Menu</div>
   <div class="card" onclick="openProduct('Cheese Burger',9,'models/burger.glb','models/burger.usdz')">
     Cheese Burger — 9 €
   </div>
@@ -81,31 +112,33 @@ button{
 
 <!-- PRODUCT -->
 <div id="product" class="screen">
-  <div class="back" onclick="go('burgers')">← Retour</div>
+  <div class="back" onclick="go('home')">← Menu</div>
 
   <model-viewer id="viewer" ar camera-controls auto-rotate
     style="width:100%;height:260px"></model-viewer>
 
   <h2 id="productName"></h2>
 
-  <div>
-    <h3>Boisson (1 incluse)</h3>
-    <div class="option active" onclick="select('drink',0,this)">Coca +0€</div>
-    <div class="option" onclick="select('drink',0,this)">Sprite +0€</div>
-    <div class="option" onclick="select('drink',1.5,this)">Boisson supp +1,50€</div>
+  <div class="qty">
+    <span>Quantité</span>
+    <div>
+      <button onclick="changeQty(-1)">−</button>
+      <span id="qty">1</span>
+      <button onclick="changeQty(1)">+</button>
+    </div>
   </div>
 
-  <div>
-    <h3>Frites</h3>
-    <div class="option active" onclick="select('fries',0,this)">Sans</div>
-    <div class="option" onclick="select('fries',2,this)">Avec +2€</div>
-  </div>
+  <h3>Boisson (1 incluse)</h3>
+  <div class="option active" onclick="select('drink',0,this)">Coca +0€</div>
+  <div class="option" onclick="select('drink',1.5,this)">Boisson supp +1,50€</div>
 
-  <div>
-    <h3>Sauce</h3>
-    <div class="option active" onclick="select('sauce',0,this)">Aucune</div>
-    <div class="option" onclick="select('sauce',0.5,this)">Ketchup +0,50€</div>
-  </div>
+  <h3>Frites</h3>
+  <div class="option active" onclick="select('fries',0,this)">Sans</div>
+  <div class="option" onclick="select('fries',2,this)">Avec +2€</div>
+
+  <h3>Sauce</h3>
+  <div class="option active" onclick="select('sauce',0,this)">Aucune</div>
+  <div class="option" onclick="select('sauce',0.5,this)">Sauce +0,50€</div>
 
   <p>Total : <strong><span id="price"></span> €</strong></p>
   <button onclick="addToCart()">Ajouter au panier</button>
@@ -116,6 +149,7 @@ button{
   <div class="back" onclick="go('home')">← Menu</div>
   <div id="cartItems"></div>
   <p>Total : <strong><span id="cartTotal">0</span> €</strong></p>
+  <button onclick="pay()">Payer mon panier</button>
 </div>
 
 <div class="cart-icon" onclick="go('cart')">
@@ -123,10 +157,11 @@ button{
 </div>
 
 <script>
-let basePrice=0;
-let currentProduct='';
+let basePrice=0,qty=1,currentProduct='';
 let options={drink:0,fries:0,sauce:0};
-let cart=[];
+let cart=JSON.parse(localStorage.getItem('cart'))||[];
+
+updateCart();
 
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -134,11 +169,12 @@ function go(id){
 }
 
 function openProduct(name,price,glb,usdz){
-  currentProduct=name;basePrice=price;
+  currentProduct=name;basePrice=price;qty=1;
   options={drink:0,fries:0,sauce:0};
   document.getElementById('productName').innerText=name;
   document.getElementById('viewer').src=glb;
   document.getElementById('viewer').setAttribute('ios-src',usdz);
+  document.getElementById('qty').innerText=qty;
   updatePrice();go('product');
 }
 
@@ -148,30 +184,43 @@ function select(type,val,el){
   options[type]=val;updatePrice();
 }
 
+function changeQty(n){
+  qty=Math.max(1,qty+n);
+  document.getElementById('qty').innerText=qty;
+  updatePrice();
+}
+
 function updatePrice(){
-  let t=basePrice+options.drink+options.fries+options.sauce;
+  let t=(basePrice+options.drink+options.fries+options.sauce)*qty;
   document.getElementById('price').innerText=t.toFixed(2);
 }
 
 function addToCart(){
-  cart.push({name:currentProduct,price:basePrice+options.drink+options.fries+options.sauce});
+  cart.push({name:currentProduct,qty,price:(basePrice+options.drink+options.fries+options.sauce)});
+  saveCart();go('home');
+}
+
+function saveCart(){
+  localStorage.setItem('cart',JSON.stringify(cart));
   updateCart();
-  go('home');
 }
 
 function updateCart(){
-  let c=document.getElementById('cartItems');
-  c.innerHTML='';let total=0;
+  let c=document.getElementById('cartItems');c.innerHTML='';
+  let total=0,count=0;
   cart.forEach((i,idx)=>{
-    total+=i.price;
-    c.innerHTML+=`<div class="card">${i.name} - ${i.price.toFixed(2)} €
-    <span style="float:right;cursor:pointer" onclick="remove(${idx})">❌</span></div>`;
+    total+=i.price*i.qty;count+=i.qty;
+    c.innerHTML+=`<div class="card">
+      ${i.name} x${i.qty} — ${(i.price*i.qty).toFixed(2)} €
+      <span style="float:right;cursor:pointer" onclick="remove(${idx})">❌</span>
+    </div>`;
   });
   document.getElementById('cartTotal').innerText=total.toFixed(2);
-  document.getElementById('cartCount').innerText=cart.length;
+  document.getElementById('cartCount').innerText=count;
 }
 
-function remove(i){cart.splice(i,1);updateCart();}
+function remove(i){cart.splice(i,1);saveCart();}
+function pay(){alert("Stripe arrive à l'étape suivante 😉");}
 </script>
 
 </body>
