@@ -1,11 +1,275 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>O'168</title>
+<meta charset="UTF-8">
+<title>O'168</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg: #0b0b0b;
+  --card: #161616;
+  --accent: #f5b700;
+  --text: #ffffff;
+  --muted: #9b9b9b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  text-align: center;
+  padding: 16px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent);
+  border-bottom: 1px solid #222;
+}
+
+.container {
+  padding: 16px;
+}
+
+.categories {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.category {
+  padding: 10px 16px;
+  background: #1f1f1f;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.category.active {
+  background: var(--accent);
+  color: black;
+  font-weight: bold;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.menu-card {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.menu-card h3 {
+  margin: 0;
+}
+
+.price {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  background: var(--accent);
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button.secondary {
+  background: #2a2a2a;
+  color: white;
+}
+
+select, input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: none;
+}
+
+.cart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  padding: 12px;
+  border-top: 1px solid #222;
+}
+
+.cart-item {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.qty {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.qty button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.hidden {
+  display: none;
+}
+</style>
 </head>
+
 <body>
-  <h1>O'168 – ça marche</h1>
-  <p>Si tu vois ce texte, GitHub Pages fonctionne.</p>
+
+<header>O'168</header>
+
+<div class="container">
+
+<!-- CATEGORIES -->
+<div class="categories">
+  <div class="category active" onclick="filterCategory('burger')">Burgers</div>
+  <div class="category" onclick="filterCategory('tacos')">Tacos</div>
+  <div class="category" onclick="filterCategory('bowl')">Bowls</div>
+</div>
+
+<!-- MENUS -->
+<div class="menu-grid" id="menu"></div>
+
+<!-- CONFIG -->
+<div id="config" class="hidden"></div>
+
+</div>
+
+<!-- PANIER -->
+<div class="cart">
+  <input type="number" id="table" placeholder="Numéro de table">
+  <div id="cartItems"></div>
+  <div class="total" id="total">Total : 0€</div>
+  <button class="secondary">Commander</button>
+</div>
+
+<script>
+const products = [
+  { id:1, name:"Smash Burger", price:8.9, cat:"burger" },
+  { id:2, name:"Double Cheese", price:9.9, cat:"burger" },
+  { id:3, name:"Tacos XL", price:9.5, cat:"tacos" },
+  { id:4, name:"Tacos Poulet", price:8.5, cat:"tacos" },
+  { id:5, name:"Bowl Poulet", price:7.9, cat:"bowl" }
+];
+
+let currentCat = "burger";
+let cart = [];
+
+function filterCategory(cat) {
+  currentCat = cat;
+  document.querySelectorAll(".category").forEach(c=>c.classList.remove("active"));
+  event.target.classList.add("active");
+  renderMenu();
+}
+
+function renderMenu() {
+  const menu = document.getElementById("menu");
+  menu.innerHTML = "";
+
+  products.filter(p=>p.cat===currentCat).forEach(p=>{
+    menu.innerHTML += `
+      <div class="menu-card">
+        <h3>${p.name}</h3>
+        <div class="price">${p.price}€</div>
+        <button onclick="openConfig(${p.id})">Choisir</button>
+      </div>
+    `;
+  });
+}
+
+function openConfig(id) {
+  const p = products.find(x=>x.id===id);
+  document.getElementById("config").classList.remove("hidden");
+  document.getElementById("config").innerHTML = `
+    <div class="menu-card">
+      <h3>${p.name}</h3>
+
+      <select id="menuOpt">
+        <option value="0">Sans menu</option>
+        <option value="3">Menu (+3€)</option>
+      </select>
+
+      <select id="fries">
+        <option>Frites classiques</option>
+        <option>Frites cheddar</option>
+      </select>
+
+      <select id="drink">
+        <option>Coca</option>
+        <option>Sprite</option>
+        <option>Eau</option>
+      </select>
+
+      <div class="qty">
+        <button onclick="changeQty(-1)">-</button>
+        <span id="qty">1</span>
+        <button onclick="changeQty(1)">+</button>
+      </div>
+
+      <button onclick="addToCart(${p.price}, '${p.name}')">Ajouter</button>
+    </div>
+  `;
+}
+
+let quantity = 1;
+function changeQty(v) {
+  quantity = Math.max(1, quantity + v);
+  document.getElementById("qty").innerText = quantity;
+}
+
+function addToCart(price, name) {
+  const extra = parseFloat(document.getElementById("menuOpt").value);
+  cart.push({ name, price: (price+extra)*quantity });
+  quantity = 1;
+  document.getElementById("config").classList.add("hidden");
+  renderCart();
+}
+
+function renderCart() {
+  let total = 0;
+  document.getElementById("cartItems").innerHTML = "";
+  cart.forEach(c=>{
+    total += c.price;
+    document.getElementById("cartItems").innerHTML += `
+      <div class="cart-item">${c.name} - ${c.price.toFixed(2)}€</div>
+    `;
+  });
+  document.getElementById("total").innerText = "Total : " + total.toFixed(2) + "€";
+}
+
+renderMenu();
+</script>
+
 </body>
 </html>
