@@ -9,7 +9,7 @@
 :root{
   --bg:#0f0f0f;
   --card:#1c1c1c;
-  --text:#ffffff;
+  --text:#fff;
   --accent:#ff3b3b;
 }
 body{
@@ -23,21 +23,50 @@ header{
   top:0;
   background:var(--bg);
   padding:14px;
-  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid #222;
+  z-index:10;
+}
+header .logo{
   font-size:22px;
   font-weight:bold;
-  border-bottom:1px solid #222;
+  cursor:pointer;
 }
 header span{color:var(--accent)}
-header .logo{cursor:pointer}
 
+#menuBtn{
+  position:absolute;
+  left:16px;
+  font-size:22px;
+  cursor:pointer;
+}
 #cartIcon{
   position:absolute;
   right:16px;
-  top:14px;
   cursor:pointer;
 }
 
+/* MENU LATERAL */
+#sideMenu{
+  position:fixed;
+  top:0;left:-260px;
+  width:260px;
+  height:100%;
+  background:#111;
+  padding:20px;
+  transition:.3s;
+  z-index:20;
+}
+#sideMenu.open{left:0}
+#sideMenu div{
+  padding:12px 0;
+  border-bottom:1px solid #222;
+  cursor:pointer;
+}
+
+/* SCREENS */
 .screen{display:none;padding:16px;}
 .screen.active{display:block;}
 
@@ -52,11 +81,8 @@ header .logo{cursor:pointer}
   padding:10px 16px;
   border-radius:20px;
   cursor:pointer;
-  white-space:nowrap;
 }
-.category.active{
-  background:var(--accent);
-}
+.category.active{background:var(--accent)}
 
 .products{
   display:grid;
@@ -69,17 +95,6 @@ header .logo{cursor:pointer}
   padding:12px;
   border-radius:14px;
   cursor:pointer;
-}
-
-button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:var(--accent);
-  color:white;
-  font-size:16px;
-  margin-top:10px;
 }
 
 .option{
@@ -104,6 +119,18 @@ button{
   width:40px;
   height:40px;
   background:#333;
+  color:#fff;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:white;
+  font-size:16px;
 }
 
 .cart-item{
@@ -114,8 +141,8 @@ button{
 }
 .cart-item button{
   width:auto;
-  background:#333;
   padding:6px 10px;
+  background:#333;
 }
 </style>
 </head>
@@ -123,30 +150,37 @@ button{
 <body>
 
 <header>
-  <div class="logo" onclick="goHome()">O'<span>168</span></div>
+  <div id="menuBtn" onclick="toggleMenu()">☰</div>
+  <div class="logo" onclick="show('menu')">O'<span>168</span></div>
   <div id="cartIcon" onclick="openCart()">🛒 <span id="cartCount">0</span></div>
 </header>
 
-<!-- MENU PRINCIPAL -->
+<!-- MENU LATERAL -->
+<div id="sideMenu">
+  <div onclick="show('menu');toggleMenu()">Accueil</div>
+  <div onclick="show('contact');toggleMenu()">Contact</div>
+  <div onclick="show('hours');toggleMenu()">Horaires</div>
+  <div onclick="show('about');toggleMenu()">À propos</div>
+  <div onclick="show('menu');toggleMenu()">Instagram</div>
+</div>
+
+<!-- MENU -->
 <div id="menu" class="screen active">
   <div class="categories" id="categories"></div>
   <div class="products" id="products"></div>
 </div>
 
-<!-- CONFIG PRODUIT -->
+<!-- CONFIG -->
 <div id="config" class="screen">
   <h2 id="productTitle"></h2>
-
   <h3>Menu</h3>
   <div class="option" onclick="selectMenu(true)">Menu (+3€)</div>
   <div class="option" onclick="selectMenu(false)">Sans menu</div>
-
   <div class="qty">
     <button onclick="changeQty(-1)">−</button>
     <div id="qty">1</div>
     <button onclick="changeQty(1)">+</button>
   </div>
-
   <button onclick="addToCart()">Ajouter au panier</button>
 </div>
 
@@ -157,16 +191,33 @@ button{
   <strong>Total : <span id="total">0</span> €</strong>
 </div>
 
+<!-- PAGES -->
+<div id="contact" class="screen">
+  <h2>Contact</h2>
+  📞 06 12 34 56 78<br>
+  📧 contact@o168-snack.fr<br>
+  📸 Instagram : @o168
+</div>
+
+<div id="hours" class="screen">
+  <h2>Horaires</h2>
+  Lun – Dim : 11h00 – 23h00
+</div>
+
+<div id="about" class="screen">
+  <h2>À propos</h2>
+  Snack street food premium, fait maison ❤️
+</div>
+
 <script>
 const data={
-  Burgers:[
-    {name:"Classic Burger",price:8},
-    {name:"Cheese Burger",price:9}
-  ],
-  Tacos:[
-    {name:"Tacos Poulet",price:7},
-    {name:"Tacos Mixte",price:8}
-  ]
+  Burgers:[{n:"Classic Burger",p:8},{n:"Cheese Burger",p:9}],
+  Tacos:[{n:"Tacos Poulet",p:7},{n:"Tacos Mixte",p:8}],
+  Pizzas:[{n:"Margherita",p:9},{n:"Pepperoni",p:11}],
+  Sandwichs:[{n:"Panini Poulet",p:6}],
+  Bowls:[{n:"Bowl Poulet",p:9}],
+  Desserts:[{n:"Brownie",p:4}],
+  Boissons:[{n:"Coca",p:2}]
 };
 
 let currentCat="Burgers";
@@ -198,7 +249,7 @@ function renderProducts(){
   data[currentCat].forEach(p=>{
     const d=document.createElement("div");
     d.className="product";
-    d.innerHTML=`<strong>${p.name}</strong><br>${p.price} €`;
+    d.innerHTML=`<strong>${p.n}</strong><br>${p.p} €`;
     d.onclick=()=>openConfig(p);
     prods.appendChild(d);
   });
@@ -211,7 +262,7 @@ function openConfig(p){
   qty=1;
   document.getElementById("qty").innerText=qty;
   document.querySelectorAll(".option").forEach(o=>o.classList.remove("active"));
-  document.getElementById("productTitle").innerText=p.name;
+  document.getElementById("productTitle").innerText=p.n;
   show("config");
 }
 
@@ -227,10 +278,17 @@ function changeQty(v){
 }
 
 function addToCart(){
-  let price=currentProduct.price+(isMenu?3:0);
-  cart.push({name:currentProduct.name,price,qty});
-  document.getElementById("cartCount").innerText=cart.length;
-  goHome();
+  let price=currentProduct.p+(isMenu?3:0);
+  const existing=cart.find(i=>i.name===currentProduct.n && i.menu===isMenu);
+  if(existing) existing.qty+=qty;
+  else cart.push({name:currentProduct.n,price,qty,menu:isMenu});
+  updateCartCount();
+  show("menu");
+}
+
+function updateCartCount(){
+  document.getElementById("cartCount").innerText=
+    cart.reduce((a,b)=>a+b.qty,0);
 }
 
 function openCart(){
@@ -245,7 +303,7 @@ function renderCart(){
     html+=`
       <div class="cart-item">
         ${i.name} x${i.qty}
-        <button onclick="cart.splice(${idx},1);renderCart()">✕</button>
+        <button onclick="cart.splice(${idx},1);renderCart();updateCartCount()">✕</button>
       </div>`;
   });
   document.getElementById("cartItems").innerHTML=html;
@@ -256,7 +314,9 @@ function show(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-function goHome(){show("menu");}
+function toggleMenu(){
+  document.getElementById("sideMenu").classList.toggle("open");
+}
 </script>
 
 </body>
