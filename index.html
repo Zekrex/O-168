@@ -5,60 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O'168</title>
 
-<script type="module"
-  src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
-</script>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <style>
-body{margin:0;font-family:Arial;background:#0e0e0e;color:#fff}
+body{margin:0;font-family:Arial;background:#0b0b0b;color:#fff}
 header{
-  position:sticky;top:0;
-  background:#0e0e0e;
-  padding:14px;
-  text-align:center;
-  border-bottom:1px solid #222;
+  display:flex;align-items:center;justify-content:center;
+  padding:14px;border-bottom:1px solid #222;position:sticky;top:0;background:#0b0b0b;z-index:10
 }
+.menu-btn{position:absolute;left:16px;font-size:22px;cursor:pointer}
 .logo{font-size:22px;font-weight:bold;cursor:pointer}
 .logo span{color:#ff3b3b}
 
 .screen{display:none;padding:16px}
 .screen.active{display:block}
 
-.category,.product{
-  background:#1a1a1a;
+.card{
+  background:#181818;
   padding:16px;
-  border-radius:14px;
+  border-radius:16px;
   margin-bottom:12px;
   cursor:pointer;
 }
 
-.back{color:#aaa;margin-bottom:10px;cursor:pointer}
+.back{margin-bottom:12px;color:#aaa;cursor:pointer}
 
-.option-group{margin-bottom:14px}
 .option{
-  display:flex;
-  justify-content:space-between;
-  padding:12px;
-  background:#222;
-  border-radius:10px;
-  margin:6px 0;
-  cursor:pointer;
+  background:#222;padding:12px;border-radius:12px;margin:6px 0;
+  display:flex;justify-content:space-between;cursor:pointer
 }
 .option.active{background:#ff3b3b}
 
-.price-box{
-  font-size:18px;
-  margin:12px 0;
+button{
+  width:100%;padding:14px;border:none;border-radius:14px;
+  background:#ff3b3b;color:white;font-size:16px
 }
 
-button{
-  width:100%;
-  padding:14px;
-  background:#ff3b3b;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  color:white;
+.cart-icon{
+  position:fixed;bottom:20px;right:20px;
+  background:#ff3b3b;width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;cursor:pointer
+}
+.cart-count{
+  position:absolute;top:-4px;right:-4px;
+  background:black;border-radius:50%;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;font-size:12px
 }
 </style>
 </head>
@@ -66,90 +58,120 @@ button{
 <body>
 
 <header>
-  <div class="logo" onclick="show('categories')">O'<span>168</span></div>
+  <div class="menu-btn">☰</div>
+  <div class="logo" onclick="go('home')">O'<span>168</span></div>
 </header>
 
-<!-- CATÉGORIES -->
-<div id="categories" class="screen active">
-  <div class="category" onclick="openCategory('burgers')">🍔 Burgers</div>
-  <div class="category">🌮 Tacos</div>
-  <div class="category">🍕 Pizzas</div>
-  <div class="category">🍰 Desserts</div>
-  <div class="category">🥤 Boissons</div>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="card" onclick="go('burgers')">🍔 Burgers</div>
+  <div class="card" onclick="go('tacos')">🌮 Tacos</div>
+  <div class="card" onclick="go('pizzas')">🍕 Pizzas</div>
+  <div class="card">🍰 Desserts</div>
+  <div class="card">🥤 Boissons</div>
 </div>
 
-<!-- PRODUITS BURGERS -->
+<!-- BURGERS -->
 <div id="burgers" class="screen">
-  <div class="back" onclick="show('categories')">← Retour</div>
-  <div class="product" onclick="openProduct()">Cheese Burger — 9 €</div>
+  <div class="back" onclick="go('home')">← Retour</div>
+  <div class="card" onclick="openProduct('Cheese Burger',9,'models/burger.glb','models/burger.usdz')">
+    Cheese Burger — 9 €
+  </div>
 </div>
 
-<!-- FICHE PRODUIT -->
+<!-- PRODUCT -->
 <div id="product" class="screen">
-  <div class="back" onclick="show('burgers')">← Retour</div>
+  <div class="back" onclick="go('burgers')">← Retour</div>
 
-  <model-viewer
-    src="models/cheeseburger.glb"
-    ios-src="models/cheeseburger.usdz"
-    ar camera-controls auto-rotate
-    style="width:100%;height:280px;">
-  </model-viewer>
+  <model-viewer id="viewer" ar camera-controls auto-rotate
+    style="width:100%;height:260px"></model-viewer>
 
-  <h2>Cheese Burger</h2>
+  <h2 id="productName"></h2>
 
-  <!-- BOISSON -->
-  <div class="option-group">
+  <div>
     <h3>Boisson (1 incluse)</h3>
-    <div class="option active" onclick="selectOption(this,'drink',0)">Coca +0€</div>
-    <div class="option" onclick="selectOption(this,'drink',0)">Sprite +0€</div>
-    <div class="option" onclick="selectOption(this,'drink',1.5)">Boisson supp +1,50€</div>
+    <div class="option active" onclick="select('drink',0,this)">Coca +0€</div>
+    <div class="option" onclick="select('drink',0,this)">Sprite +0€</div>
+    <div class="option" onclick="select('drink',1.5,this)">Boisson supp +1,50€</div>
   </div>
 
-  <!-- FRITES -->
-  <div class="option-group">
+  <div>
     <h3>Frites</h3>
-    <div class="option active" onclick="selectOption(this,'fries',0)">Sans frites</div>
-    <div class="option" onclick="selectOption(this,'fries',2)">Avec frites +2€</div>
+    <div class="option active" onclick="select('fries',0,this)">Sans</div>
+    <div class="option" onclick="select('fries',2,this)">Avec +2€</div>
   </div>
 
-  <!-- SAUCES -->
-  <div class="option-group">
-    <h3>Sauce extra</h3>
-    <div class="option active" onclick="selectOption(this,'sauce',0)">Aucune</div>
-    <div class="option" onclick="selectOption(this,'sauce',0.5)">Ketchup +0,50€</div>
-    <div class="option" onclick="selectOption(this,'sauce',0.5)">Mayo +0,50€</div>
+  <div>
+    <h3>Sauce</h3>
+    <div class="option active" onclick="select('sauce',0,this)">Aucune</div>
+    <div class="option" onclick="select('sauce',0.5,this)">Ketchup +0,50€</div>
   </div>
 
-  <div class="price-box">
-    Total : <strong><span id="total">9.00</span> €</strong>
-  </div>
+  <p>Total : <strong><span id="price"></span> €</strong></p>
+  <button onclick="addToCart()">Ajouter au panier</button>
+</div>
 
-  <button>Ajouter au panier</button>
+<!-- PANIER -->
+<div id="cart" class="screen">
+  <div class="back" onclick="go('home')">← Menu</div>
+  <div id="cartItems"></div>
+  <p>Total : <strong><span id="cartTotal">0</span> €</strong></p>
+</div>
+
+<div class="cart-icon" onclick="go('cart')">
+  🛒 <div class="cart-count" id="cartCount">0</div>
 </div>
 
 <script>
-let basePrice = 9;
-let selections = {drink:0, fries:0, sauce:0};
+let basePrice=0;
+let currentProduct='';
+let options={drink:0,fries:0,sauce:0};
+let cart=[];
 
-function show(id){
+function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function openCategory(id){ show(id); }
-function openProduct(){ show('product'); }
+function openProduct(name,price,glb,usdz){
+  currentProduct=name;basePrice=price;
+  options={drink:0,fries:0,sauce:0};
+  document.getElementById('productName').innerText=name;
+  document.getElementById('viewer').src=glb;
+  document.getElementById('viewer').setAttribute('ios-src',usdz);
+  updatePrice();go('product');
+}
 
-function selectOption(el, group, price){
+function select(type,val,el){
   el.parentElement.querySelectorAll('.option').forEach(o=>o.classList.remove('active'));
   el.classList.add('active');
-  selections[group] = price;
-  updateTotal();
+  options[type]=val;updatePrice();
 }
 
-function updateTotal(){
-  let total = basePrice + selections.drink + selections.fries + selections.sauce;
-  document.getElementById('total').innerText = total.toFixed(2);
+function updatePrice(){
+  let t=basePrice+options.drink+options.fries+options.sauce;
+  document.getElementById('price').innerText=t.toFixed(2);
 }
+
+function addToCart(){
+  cart.push({name:currentProduct,price:basePrice+options.drink+options.fries+options.sauce});
+  updateCart();
+  go('home');
+}
+
+function updateCart(){
+  let c=document.getElementById('cartItems');
+  c.innerHTML='';let total=0;
+  cart.forEach((i,idx)=>{
+    total+=i.price;
+    c.innerHTML+=`<div class="card">${i.name} - ${i.price.toFixed(2)} €
+    <span style="float:right;cursor:pointer" onclick="remove(${idx})">❌</span></div>`;
+  });
+  document.getElementById('cartTotal').innerText=total.toFixed(2);
+  document.getElementById('cartCount').innerText=cart.length;
+}
+
+function remove(i){cart.splice(i,1);updateCart();}
 </script>
 
 </body>
