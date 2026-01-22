@@ -1,246 +1,198 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O'168</title>
 
 <style>
-:root{
-  --bg:#ffffff;
-  --text:#000;
-  --card:#f2f2f2;
-  --accent:#ff3b3b;
-}
-.dark{
-  --bg:#0f0f0f;
-  --text:#fff;
-  --card:#1c1c1c;
-}
-
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  background:#fff;
+  color:#000;
 }
-
 header{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:14px;
   position:sticky;
   top:0;
-  background:var(--bg);
-  border-bottom:1px solid #3333;
-  z-index:10;
+  background:#fff;
+  padding:14px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  border-bottom:1px solid #ddd;
 }
+header span{color:#ff3b3b}
 
-header h1{
-  margin:0;
-}
-header span{color:var(--accent);}
-.theme-toggle{
+#cartIcon{
   position:absolute;
   right:16px;
+  top:14px;
+  font-size:20px;
   cursor:pointer;
+}
+
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+
+.product{
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  margin-bottom:12px;
+  cursor:pointer;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#ff3b3b;
+  color:#fff;
+  font-size:16px;
+  margin-top:10px;
+}
+
+.option{
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin:8px 0;
+  cursor:pointer;
+}
+.option.active{
+  background:#ff3b3b;
+  color:white;
+  border-color:#ff3b3b;
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:16px 0;
+}
+.qty button{
+  width:40px;
+  height:40px;
   font-size:20px;
 }
 
-.categories{
-  display:flex;
-  gap:10px;
-  padding:12px;
-  overflow-x:auto;
-}
-.category{
-  padding:10px 16px;
-  background:var(--card);
-  border-radius:20px;
-  cursor:pointer;
-  white-space:nowrap;
-  font-weight:bold;
-}
-.category.active{
-  background:var(--accent);
-  color:white;
-}
-
-.products{
-  padding:12px;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:12px;
-}
-
-.product{
-  background:var(--card);
-  border-radius:14px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.product button{
-  padding:8px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-}
-.add{background:var(--accent);color:white;}
-.ar{background:#444;color:white;}
-.qr{background:#888;color:white;}
-
-.cart{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  background:black;
-  color:white;
-  padding:12px;
+.cart-item{
   display:flex;
   justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
 }
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:#0008;
-  display:none;
-  align-items:flex-end;
+.cart-item button{
+  width:auto;
+  padding:6px 10px;
+  background:#000;
 }
-.modal-content{
-  background:var(--bg);
-  width:100%;
-  border-radius:16px 16px 0 0;
-  padding:16px;
-  max-height:80%;
-  overflow:auto;
-}
-.close{text-align:right;font-weight:bold;cursor:pointer}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>O'<span>168</span></h1>
-  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+  O'<span>168</span>
+  <div id="cartIcon" onclick="go('cart')">🛒 (<span id="cartCount">0</span>)</div>
 </header>
 
-<div class="categories" id="categories"></div>
-<div class="products" id="products"></div>
+<!-- ÉTAPE 1 : PRODUITS -->
+<div id="products" class="screen active">
+  <h2>Nos produits</h2>
 
-<div class="cart">
-  <div id="cart-count">0 article</div>
-  <button onclick="openCart()">Panier</button>
-</div>
-
-<div class="modal" id="cartModal">
-  <div class="modal-content">
-    <div class="close" onclick="closeCart()">✕</div>
-    <h2>Votre commande</h2>
-    <div id="cartItems"></div>
-    <label>Numéro de table
-      <input type="number" style="width:100%;padding:8px">
-    </label>
+  <div class="product" onclick="selectProduct('Classic Burger',8)">
+    🍔 Classic Burger – 8€
+  </div>
+  <div class="product" onclick="selectProduct('Cheese Burger',9)">
+    🍔 Cheese Burger – 9€
+  </div>
+  <div class="product" onclick="selectProduct('Tacos Poulet',7)">
+    🌯 Tacos Poulet – 7€
   </div>
 </div>
 
-<script>
-const data={
-  Burgers:[
-    {n:"Classic Burger",p:8},
-    {n:"Cheese Burger",p:9},
-    {n:"Double Smash",p:11},
-    {n:"BBQ Burger",p:10}
-  ],
-  Tacos:[
-    {n:"Tacos Poulet",p:7},
-    {n:"Tacos Mixte",p:8},
-    {n:"Tacos XL",p:10}
-  ],
-  Bowls:[
-    {n:"Bowl Poulet",p:9},
-    {n:"Bowl Saumon",p:11}
-  ],
-  Pizzas:[
-    {n:"Margherita",p:9},
-    {n:"Pepperoni",p:11}
-  ],
-  Sandwichs:[
-    {n:"Panini Poulet",p:6},
-    {n:"Wrap Boeuf",p:7}
-  ],
-  Desserts:[
-    {n:"Brownie",p:4},
-    {n:"Cheesecake",p:5}
-  ],
-  Boissons:[
-    {n:"Coca",p:2},
-    {n:"Ice Tea",p:2}
-  ]
-};
+<!-- ÉTAPE 2 : OPTIONS -->
+<div id="options" class="screen">
+  <h2 id="productTitle"></h2>
 
-let currentCat=Object.keys(data)[0];
+  <h3>Menu ?</h3>
+  <div class="option" onclick="choose('menu',true)">Menu (+3€)</div>
+  <div class="option" onclick="choose('menu',false)">Sans menu</div>
+
+  <h3>Boisson</h3>
+  <div class="option" onclick="choose('drink','Coca')">Coca</div>
+  <div class="option" onclick="choose('drink','Ice Tea')">Ice Tea</div>
+
+  <div class="qty">
+    <button onclick="qty--">−</button>
+    <div id="qty">1</div>
+    <button onclick="qty++">+</button>
+  </div>
+
+  <button onclick="addToCart()">Ajouter au panier</button>
+</div>
+
+<!-- ÉTAPE 3 : PANIER -->
+<div id="cart" class="screen">
+  <h2>Panier</h2>
+  <div id="cartItems"></div>
+  <strong>Total : <span id="total">0</span> €</strong>
+  <button>Commander</button>
+</div>
+
+<script>
+let currentProduct=null;
+let config={menu:false,drink:null};
+let qty=1;
 let cart=[];
 
-const cats=document.getElementById("categories");
-const prods=document.getElementById("products");
-
-Object.keys(data).forEach((c,i)=>{
-  const d=document.createElement("div");
-  d.className="category"+(i===0?" active":"");
-  d.textContent=c;
-  d.onclick=()=>selectCat(c,d);
-  cats.appendChild(d);
-});
-
-function selectCat(c,el){
-  document.querySelectorAll(".category").forEach(x=>x.classList.remove("active"));
-  el.classList.add("active");
-  currentCat=c;
-  render();
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function render(){
-  prods.innerHTML="";
-  data[currentCat].forEach(p=>{
-    const d=document.createElement("div");
-    d.className="product";
-    d.innerHTML=`
-      <strong>${p.n}</strong>
-      <span>${p.p} €</span>
-      <button class="add" onclick="add('${p.n}',${p.p})">Ajouter</button>
-      <button class="ar">Voir en AR</button>
-      <button class="qr">QR produit</button>
-    `;
-    prods.appendChild(d);
+function selectProduct(name,price){
+  currentProduct={name,price};
+  config={menu:false,drink:null};
+  qty=1;
+  document.getElementById('productTitle').innerText=name;
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('active'));
+  go('options');
+}
+
+function choose(type,value){
+  config[type]=value;
+  event.target.classList.toggle('active');
+}
+
+function addToCart(){
+  let price=currentProduct.price+(config.menu?3:0);
+  cart.push({...currentProduct,config,qty,price});
+  document.getElementById('cartCount').innerText=cart.length;
+  go('products');
+}
+
+function renderCart(){
+  let html='',total=0;
+  cart.forEach((i,index)=>{
+    total+=i.price*i.qty;
+    html+=`
+      <div class="cart-item">
+        ${i.name} x${i.qty}
+        <button onclick="cart.splice(${index},1);renderCart()">✕</button>
+      </div>`;
   });
+  document.getElementById('cartItems').innerHTML=html;
+  document.getElementById('total').innerText=total;
 }
-
-function add(n,p){
-  cart.push({n,p});
-  document.getElementById("cart-count").textContent=cart.length+" article(s)";
-}
-
-function openCart(){
-  const ci=document.getElementById("cartItems");
-  ci.innerHTML="";
-  cart.forEach(i=>ci.innerHTML+=`<div>${i.n} - ${i.p}€</div>`);
-  document.getElementById("cartModal").style.display="flex";
-}
-function closeCart(){document.getElementById("cartModal").style.display="none";}
-
-function toggleTheme(){
-  document.body.classList.toggle("dark");
-  localStorage.theme=document.body.classList.contains("dark")?"dark":"light";
-}
-if(localStorage.theme==="dark")document.body.classList.add("dark");
-
-render();
+document.getElementById('cartIcon').onclick=()=>{
+  renderCart();
+  go('cart');
+};
 </script>
 
 </body>
