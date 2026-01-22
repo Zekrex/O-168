@@ -1,275 +1,277 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>O'168</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>O'168</title>
 
-<style>
-:root {
-  --bg: #0b0b0b;
-  --card: #161616;
-  --accent: #f5b700;
-  --text: #ffffff;
-  --muted: #9b9b9b;
-}
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f3f3f3;
+      --accent: #ff3b3b;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid #ddd;
+      padding: 14px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-header {
-  text-align: center;
-  padding: 16px;
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--accent);
-  border-bottom: 1px solid #222;
-}
+    header span {
+      color: var(--accent);
+    }
 
-.container {
-  padding: 16px;
-}
+    /* CATEGORIES */
+    .categories {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      overflow-x: auto;
+    }
 
-.categories {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  margin-bottom: 16px;
-}
+    .category {
+      flex: 0 0 auto;
+      padding: 10px 16px;
+      background: var(--card);
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: bold;
+    }
 
-.category {
-  padding: 10px 16px;
-  background: #1f1f1f;
-  border-radius: 20px;
-  cursor: pointer;
-  white-space: nowrap;
-}
+    .category.active {
+      background: var(--accent);
+      color: white;
+    }
 
-.category.active {
-  background: var(--accent);
-  color: black;
-  font-weight: bold;
-}
+    /* PRODUITS */
+    .products {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
 
-.menu-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+    .product {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-.menu-card {
-  background: var(--card);
-  padding: 14px;
-  border-radius: 14px;
-}
+    .product h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
 
-.menu-card h3 {
-  margin: 0;
-}
+    .product p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.8;
+    }
 
-.price {
-  color: var(--accent);
-  font-weight: bold;
-}
+    .product button {
+      margin-top: 10px;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  background: var(--accent);
-  cursor: pointer;
-  margin-top: 10px;
-}
+    /* PANIER */
+    .cart {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      color: #fff;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-button.secondary {
-  background: #2a2a2a;
-  color: white;
-}
+    .cart button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-select, input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border-radius: 8px;
-  border: none;
-}
+    /* MODAL PANIER */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
 
-.cart {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #000;
-  padding: 12px;
-  border-top: 1px solid #222;
-}
+    .modal-content {
+      background: var(--bg);
+      width: 100%;
+      max-height: 80%;
+      border-radius: 16px 16px 0 0;
+      padding: 16px;
+      overflow-y: auto;
+    }
 
-.cart-item {
-  font-size: 14px;
-  margin-bottom: 6px;
-}
+    .modal h2 {
+      margin-top: 0;
+    }
 
-.qty {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 8px;
-}
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
 
-.qty button {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  font-size: 18px;
-}
-
-.total {
-  font-size: 18px;
-  font-weight: bold;
-  margin-top: 6px;
-}
-
-.hidden {
-  display: none;
-}
-</style>
+    .close {
+      text-align: right;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>O'168</header>
+  <header>
+    O'<span>168</span>
+  </header>
 
-<div class="container">
+  <!-- CATEGORIES -->
+  <div class="categories" id="categories">
+    <div class="category active" data-cat="burger">Burgers</div>
+    <div class="category" data-cat="tacos">Tacos</div>
+    <div class="category" data-cat="bowl">Bowls</div>
+    <div class="category" data-cat="boisson">Boissons</div>
+  </div>
 
-<!-- CATEGORIES -->
-<div class="categories">
-  <div class="category active" onclick="filterCategory('burger')">Burgers</div>
-  <div class="category" onclick="filterCategory('tacos')">Tacos</div>
-  <div class="category" onclick="filterCategory('bowl')">Bowls</div>
-</div>
+  <!-- PRODUITS -->
+  <div class="products" id="products"></div>
 
-<!-- MENUS -->
-<div class="menu-grid" id="menu"></div>
+  <!-- PANIER BAR -->
+  <div class="cart">
+    <div id="cart-count">0 article</div>
+    <button onclick="openCart()">Voir panier</button>
+  </div>
 
-<!-- CONFIG -->
-<div id="config" class="hidden"></div>
-
-</div>
-
-<!-- PANIER -->
-<div class="cart">
-  <input type="number" id="table" placeholder="Numéro de table">
-  <div id="cartItems"></div>
-  <div class="total" id="total">Total : 0€</div>
-  <button class="secondary">Commander</button>
-</div>
-
-<script>
-const products = [
-  { id:1, name:"Smash Burger", price:8.9, cat:"burger" },
-  { id:2, name:"Double Cheese", price:9.9, cat:"burger" },
-  { id:3, name:"Tacos XL", price:9.5, cat:"tacos" },
-  { id:4, name:"Tacos Poulet", price:8.5, cat:"tacos" },
-  { id:5, name:"Bowl Poulet", price:7.9, cat:"bowl" }
-];
-
-let currentCat = "burger";
-let cart = [];
-
-function filterCategory(cat) {
-  currentCat = cat;
-  document.querySelectorAll(".category").forEach(c=>c.classList.remove("active"));
-  event.target.classList.add("active");
-  renderMenu();
-}
-
-function renderMenu() {
-  const menu = document.getElementById("menu");
-  menu.innerHTML = "";
-
-  products.filter(p=>p.cat===currentCat).forEach(p=>{
-    menu.innerHTML += `
-      <div class="menu-card">
-        <h3>${p.name}</h3>
-        <div class="price">${p.price}€</div>
-        <button onclick="openConfig(${p.id})">Choisir</button>
-      </div>
-    `;
-  });
-}
-
-function openConfig(id) {
-  const p = products.find(x=>x.id===id);
-  document.getElementById("config").classList.remove("hidden");
-  document.getElementById("config").innerHTML = `
-    <div class="menu-card">
-      <h3>${p.name}</h3>
-
-      <select id="menuOpt">
-        <option value="0">Sans menu</option>
-        <option value="3">Menu (+3€)</option>
-      </select>
-
-      <select id="fries">
-        <option>Frites classiques</option>
-        <option>Frites cheddar</option>
-      </select>
-
-      <select id="drink">
-        <option>Coca</option>
-        <option>Sprite</option>
-        <option>Eau</option>
-      </select>
-
-      <div class="qty">
-        <button onclick="changeQty(-1)">-</button>
-        <span id="qty">1</span>
-        <button onclick="changeQty(1)">+</button>
-      </div>
-
-      <button onclick="addToCart(${p.price}, '${p.name}')">Ajouter</button>
+  <!-- MODAL PANIER -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div class="close" onclick="closeCart()">✕</div>
+      <h2>Votre commande</h2>
+      <div id="cartItems"></div>
+      <hr>
+      <label>
+        Numéro de table :
+        <input type="number" id="tableNumber" style="width:100%;padding:8px;">
+      </label>
+      <br><br>
+      <button style="width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:10px;">
+        Continuer
+      </button>
     </div>
-  `;
-}
+  </div>
 
-let quantity = 1;
-function changeQty(v) {
-  quantity = Math.max(1, quantity + v);
-  document.getElementById("qty").innerText = quantity;
-}
+  <script>
+    const data = {
+      burger: [
+        { name: "Classic Burger", price: 8 },
+        { name: "Cheese Burger", price: 9 },
+        { name: "Double Smash", price: 11 }
+      ],
+      tacos: [
+        { name: "Tacos Poulet", price: 7 },
+        { name: "Tacos Mixte", price: 8 }
+      ],
+      bowl: [
+        { name: "Bowl Poulet", price: 9 }
+      ],
+      boisson: [
+        { name: "Coca", price: 2 },
+        { name: "Ice Tea", price: 2 }
+      ]
+    };
 
-function addToCart(price, name) {
-  const extra = parseFloat(document.getElementById("menuOpt").value);
-  cart.push({ name, price: (price+extra)*quantity });
-  quantity = 1;
-  document.getElementById("config").classList.add("hidden");
-  renderCart();
-}
+    let currentCat = "burger";
+    let cart = [];
 
-function renderCart() {
-  let total = 0;
-  document.getElementById("cartItems").innerHTML = "";
-  cart.forEach(c=>{
-    total += c.price;
-    document.getElementById("cartItems").innerHTML += `
-      <div class="cart-item">${c.name} - ${c.price.toFixed(2)}€</div>
-    `;
-  });
-  document.getElementById("total").innerText = "Total : " + total.toFixed(2) + "€";
-}
+    const productsEl = document.getElementById("products");
+    const cartCount = document.getElementById("cart-count");
+    const cartItems = document.getElementById("cartItems");
 
-renderMenu();
-</script>
+    function renderProducts() {
+      productsEl.innerHTML = "";
+      data[currentCat].forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <h3>${p.name}</h3>
+          <p>${p.price} €</p>
+          <button onclick='addToCart("${p.name}", ${p.price})'>Ajouter</button>
+        `;
+        productsEl.appendChild(div);
+      });
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      cartCount.textContent = cart.length + " article(s)";
+    }
+
+    function openCart() {
+      cartItems.innerHTML = "";
+      cart.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `<span>${item.name}</span><span>${item.price} €</span>`;
+        cartItems.appendChild(div);
+      });
+      document.getElementById("cartModal").style.display = "flex";
+    }
+
+    function closeCart() {
+      document.getElementById("cartModal").style.display = "none";
+    }
+
+    document.querySelectorAll(".category").forEach(cat => {
+      cat.onclick = () => {
+        document.querySelectorAll(".category").forEach(c => c.classList.remove("active"));
+        cat.classList.add("active");
+        currentCat = cat.dataset.cat;
+        renderProducts();
+      };
+    });
+
+    renderProducts();
+  </script>
 
 </body>
 </html>
+
